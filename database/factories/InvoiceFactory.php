@@ -23,7 +23,6 @@ class InvoiceFactory extends Factory
         $bookingId = Booking::inRandomOrder()->first()->id;
         $staffId = Staff::inRandomOrder()->first()->id;
 
-
         return [
             'booking_id' => $bookingId,
             'staff_id' => $staffId,
