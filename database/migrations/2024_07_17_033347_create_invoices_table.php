@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
-            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('staff_id')->references('id')->on('staffs')->onDelete('cascade');
             $table->decimal('total_amount')->default(0);
             $table->enum('payment_status', ['pending', 'paid', 'cancelled'])->default('pending');
             $table->timestamps();
