@@ -59,6 +59,37 @@ class SongController extends Controller
         ]);
     }
 
+    public function update (Request $request, $id) {
+        $foundItem = Song::find($id);
+
+        if (!$foundItem) {
+            return response()->json([
+                'statusCode' => 404,
+                'message' => "Song with id::{$id} not found!"
+            ]);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'title' => 'string',
+            'artist' => 'string',
+            'duration' => 'decimal:2|min:1|max:10',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $foundItem->update($request->all());
+
+        return response()->json([
+            'statusCode' => 204,
+            'message' => "Update song with id::{$id} successfully!"
+        ]);
+    }
+
     public function getDetails ($id) {
         $foundItem = Song::find($id);
 
@@ -67,6 +98,24 @@ class SongController extends Controller
                 'statusCode' => 200,
                 'message' => 'Get song details successfully!',
                 'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Song details with id::{$id} not found!"
+        ]);
+    }
+
+    public function destroy ($id) {
+        $foundItem = Song::find($id);
+
+        if ($foundItem) {
+            Song::destroy($id);
+
+            return response()->json([
+                'statusCode' => 204,
+                'message' => 'Delete song successfully!',
             ]);
         }
 

@@ -60,6 +60,38 @@ class StaffController extends Controller
         ]);
     }
 
+    public function update (Request $request, $id) {
+        $foundItem = Staff::find($id);
+
+        if (!$foundItem) {
+            return response()->json([
+                'statusCode' => 404,
+                'message' => "Staff with id::{$id} not found!"
+            ]);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'staff_name' => 'string',
+            'role' => 'string|in:manager,receptionist,waiter',
+            'phone' => 'unique:staffs,phone|string',
+            'email' => 'unique:staffs,email|string|email',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $foundItem->update($request->all());
+
+        return response()->json([
+            'statusCode' => 204,
+            'message' => "Update staff with id::{$id} successfully!"
+        ]);
+    }
+
     public function getDetails ($id) {
         $foundItem = Staff::find($id);
 
@@ -68,6 +100,24 @@ class StaffController extends Controller
                 'statusCode' => 200,
                 'message' => 'Get staff details successfully!',
                 'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Staff details with id::{$id} not found!"
+        ]);
+    }
+
+    public function destroy ($id) {
+        $foundItem = Staff::find($id);
+
+        if ($foundItem) {
+            Staff::destroy($id);
+
+            return response()->json([
+                'statusCode' => 204,
+                'message' => 'Delete staff successfully!',
             ]);
         }
 

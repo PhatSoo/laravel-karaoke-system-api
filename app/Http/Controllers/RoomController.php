@@ -76,4 +76,54 @@ class RoomController extends Controller
             'message' => 'Create new room successfully!'
         ]);
     }
+
+    public function update (Request $request, $id) {
+        $foundItem = Room::find($id);
+
+        if (!$foundItem) {
+            return response()->json([
+                'statusCode' => 404,
+                'message' => "Room with id::{$id} not found!"
+            ]);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'room_name' => 'unique:rooms,room_name|max:100',
+            'capacity' => 'numeric|min:0|max:20',
+            'price_per_hour' => 'decimal:2|min:10',
+            'status' => 'string|in:available,occupied,maintenance',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $foundItem->update($request->all());
+
+        return response()->json([
+            'statusCode' => 204,
+            'message' => "Update room with id::{$id} successfully!"
+        ]);
+    }
+
+    public function destroy ($id) {
+        $foundItem = Room::find($id);
+
+        if ($foundItem) {
+            Room::destroy($id);
+
+            return response()->json([
+                'statusCode' => 204,
+                'message' => 'Delete room successfully!',
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Room details with id::{$id} not found!"
+        ]);
+    }
 }

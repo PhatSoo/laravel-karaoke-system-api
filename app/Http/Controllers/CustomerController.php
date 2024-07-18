@@ -75,4 +75,53 @@ class CustomerController extends Controller
             'message' => "Customer details with id::{$id} not found!"
         ]);
     }
+
+    public function update (Request $request, $id) {
+        $foundItem = Customer::find($id);
+
+        if (!$foundItem) {
+            return response()->json([
+                'statusCode' => 404,
+                'message' => "Customer with id::{$id} not found!"
+            ]);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'customer_name' => 'string',
+            'customer_phone' => 'unique:customers,customer_phone|string',
+            'customer_email' => 'unique:customers|string|email',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $foundItem->update($request->all());
+
+        return response()->json([
+            'statusCode' => 204,
+            'message' => "Update customer with id::{$id} successfully!"
+        ]);
+    }
+
+    public function destroy ($id) {
+        $foundItem = Customer::find($id);
+
+        if ($foundItem) {
+            Customer::destroy($id);
+
+            return response()->json([
+                'statusCode' => 204,
+                'message' => 'Delete customer successfully!',
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Customer details with id::{$id} not found!"
+        ]);
+    }
 }

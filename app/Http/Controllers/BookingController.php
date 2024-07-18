@@ -62,6 +62,39 @@ class BookingController extends Controller
         ]);
     }
 
+    public function update (Request $request, $id) {
+        $foundItem = Booking::find($id);
+
+        if (!$foundItem) {
+            return response()->json([
+                'statusCode' => 404,
+                'message' => "Booking with id::{$id} not found!"
+            ]);
+        }
+
+        $validated = Validator::make($request->all(),[
+            'room_id' => ['numeric', Rule::exists('rooms', 'id')],
+            'customer_id' => ['numeric', Rule::exists('customers', 'id')],
+            'start_time' => 'date',
+            'end_time' => 'date',
+            'status' => 'string|in:booked,completed,cancelled'
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $foundItem->update($request->all());
+
+        return response()->json([
+            'statusCode' => 204,
+            'message' => "Update booking with id::{$id} successfully!"
+        ]);
+    }
+
     public function getDetails ($id) {
         $foundItem = Booking::find($id);
 
@@ -70,6 +103,24 @@ class BookingController extends Controller
                 'statusCode' => 200,
                 'message' => 'Get booking details successfully!',
                 'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Booking details with id::{$id} not found!"
+        ]);
+    }
+
+    public function destroy ($id) {
+        $foundItem = Booking::find($id);
+
+        if ($foundItem) {
+            Booking::destroy($id);
+
+            return response()->json([
+                'statusCode' => 204,
+                'message' => 'Delete booking successfully!',
             ]);
         }
 
