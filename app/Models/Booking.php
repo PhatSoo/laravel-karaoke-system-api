@@ -12,6 +12,8 @@ class Booking extends Model
 
     protected $hidden = ['room_id', 'customer_id'];
 
+    protected $with = ['room', 'customer'];
+
     protected $fillable = [
         'room_id',
         'customer_id',

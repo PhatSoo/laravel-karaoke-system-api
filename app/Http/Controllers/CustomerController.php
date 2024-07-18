@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Customer;
 
@@ -23,7 +24,7 @@ class CustomerController extends Controller
         $room = $allRooms->skip($offset)->take($limit)->get();
 
         return response()->json([
-            'status' => 200,
+            'statusCode' => 200,
             'message' => 'Get all customers successfully!',
             'pagination' => [
                 'total' => $total,
@@ -31,6 +32,47 @@ class CustomerController extends Controller
                 'limit' => $limit
             ],
             'data' => $room
+        ]);
+    }
+
+    public function create(Request $request) {
+        $validated = Validator::make($request->all(), [
+            'customer_name' => 'required',
+            'customer_phone' => 'required|unique:customers,customer_phone|string',
+            'customer_email' => 'required|unique:customers|string|email',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $createdNew = new Customer();
+        $createdNew->fill($request->all());
+        $createdNew->save();
+
+        return response()->json([
+            'statusCode' => 201,
+            'message' => 'Create new customer successfully!'
+        ]);
+    }
+
+    public function getDetails ($id) {
+        $foundItem = Customer::find($id);
+
+        if ($foundItem) {
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Get customer details successfully!',
+                'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Customer details with id::{$id} not found!"
         ]);
     }
 }

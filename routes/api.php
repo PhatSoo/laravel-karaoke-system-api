@@ -12,24 +12,48 @@ use App\Http\Controllers\StaffController;
 
 Route::controller(BookingController::class)->prefix('booking')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });
 
 Route::controller(CustomerController::class)->prefix('customer')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });
 
 Route::controller(InvoiceController::class)->prefix('invoice')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });
 
 Route::controller(RoomController::class)->prefix('room')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });
 
 Route::controller(SongController::class)->prefix('song')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });
 
 Route::controller(StaffController::class)->prefix('staff')->group(function () {
     Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });

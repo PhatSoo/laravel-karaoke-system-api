@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Song;
 
@@ -23,7 +24,7 @@ class SongController extends Controller
         $room = $allRooms->skip($offset)->take($limit)->get();
 
         return response()->json([
-            'status' => 200,
+            'statusCode' => 200,
             'message' => 'Get all songs successfully!',
             'pagination' => [
                 'total' => $total,
@@ -31,6 +32,47 @@ class SongController extends Controller
                 'limit' => $limit
             ],
             'data' => $room
+        ]);
+    }
+
+    public function create(Request $request) {
+        $validated = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'artist' => 'required|string',
+            'duration' => 'required|decimal:2|min:1|max:10',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $createdNew = new Song();
+        $createdNew->fill($request->all());
+        $createdNew->save();
+
+        return response()->json([
+            'statusCode' => 201,
+            'message' => 'Create new song successfully!'
+        ]);
+    }
+
+    public function getDetails ($id) {
+        $foundItem = Song::find($id);
+
+        if ($foundItem) {
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Get song details successfully!',
+                'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Song details with id::{$id} not found!"
         ]);
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 use App\Models\Invoice;
 
@@ -17,13 +19,13 @@ class InvoiceController extends Controller
 
         $offset = ($current_page - 1) * $limit;
 
-        $allRooms = Invoice::orderBy('id', 'ASC')->with(['staff', 'booking']);
+        $allRooms = Invoice::orderBy('id', 'ASC');
         $total = $allRooms->count();
 
         $room = $allRooms->skip($offset)->take($limit)->get();
 
         return response()->json([
-            'status' => 200,
+            'statusCode' => 200,
             'message' => 'Get all invoices successfully!',
             'pagination' => [
                 'total' => $total,
@@ -31,6 +33,48 @@ class InvoiceController extends Controller
                 'limit' => $limit
             ],
             'data' => $room
+        ]);
+    }
+
+    public function create(Request $request) {
+        $validated = Validator::make($request->all(),[
+            'booking_id' => ['required', 'numeric', Rule::exists('bookings', 'id')],
+            'staff_id' => ['required', 'numeric', Rule::exists('staffs', 'id')],
+            'total_amount' => 'decimal:2',
+            'payment_status' => 'string|in:pending,paid,cancelled'
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $createdNew = new Invoice();
+        $createdNew->fill($request->all());
+        $createdNew->save();
+
+        return response()->json([
+            'statusCode' => 201,
+            'message' => 'Create new invoice successfully!'
+        ]);
+    }
+
+    public function getDetails ($id) {
+        $foundItem = Invoice::find($id);
+
+        if ($foundItem) {
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Get invoice details successfully!',
+                'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Invoice details with id::{$id} not found!"
         ]);
     }
 }

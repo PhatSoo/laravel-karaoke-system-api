@@ -12,6 +12,8 @@ class Invoice extends Model
 
     protected $hidden = ['booking_id', 'staff_id'];
 
+    protected $with = ['staff', 'booking'];
+
     protected $fillable = [
         'booking_id',
         'staff_id',

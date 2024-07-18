@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Staff;
 
@@ -23,7 +24,7 @@ class StaffController extends Controller
         $room = $allRooms->skip($offset)->take($limit)->get();
 
         return response()->json([
-            'status' => 200,
+            'statusCode' => 200,
             'message' => 'Get all staffs successfully!',
             'pagination' => [
                 'total' => $total,
@@ -31,6 +32,48 @@ class StaffController extends Controller
                 'limit' => $limit
             ],
             'data' => $room
+        ]);
+    }
+
+    public function create(Request $request) {
+        $validated = Validator::make($request->all(), [
+            'staff_name' => 'required|string',
+            'role' => 'required|string|in:manager,receptionist,waiter',
+            'phone' => 'required|unique:staffs,phone|string',
+            'email' => 'required|unique:staffs,email|string|email',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => $validated->messages()
+            ]);
+        }
+
+        $createdNew = new Staff();
+        $createdNew->fill($request->all());
+        $createdNew->save();
+
+        return response()->json([
+            'statusCode' => 201,
+            'message' => 'Create new staff successfully!'
+        ]);
+    }
+
+    public function getDetails ($id) {
+        $foundItem = Staff::find($id);
+
+        if ($foundItem) {
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Get staff details successfully!',
+                'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => "Staff details with id::{$id} not found!"
         ]);
     }
 }
