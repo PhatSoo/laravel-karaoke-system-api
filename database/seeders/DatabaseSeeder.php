@@ -21,7 +21,13 @@ class DatabaseSeeder extends Seeder
     {
         Room::factory()->count(10)->create();
         Staff::factory()->count(10)->create();
-        Customer::factory()->count(10)->create();
+        Customer::insert([
+            'name' => 'Unknown Guest',
+            'phone' => 'null',
+            'email' => 'null',
+            'password' => 'null',
+        ]);
+        Customer::factory()->count(9)->create();
         Song::factory()->count(10)->create();
         Booking::factory()->count(10)->create();
         Invoice::factory()->count(10)->create();

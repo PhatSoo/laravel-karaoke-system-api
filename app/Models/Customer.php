@@ -10,8 +10,15 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_name',
-        'customer_phone',
-        'customer_email',
+        'name',
+        'phone',
+        'email',
+        'password'
     ];
+
+    protected function casts() {
+        return [
+            'password' => 'hashed'
+        ];
+    }
 }

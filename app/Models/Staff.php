@@ -12,9 +12,16 @@ class Staff extends Model
     protected $table = 'staffs';
 
     protected $fillable = [
-        'staff_name',
+        'name',
         'role',
         'phone',
         'email',
+        'password'
     ];
+
+    protected function casts() {
+        return [
+            'password' => 'hashed'
+        ];
+    }
 }
