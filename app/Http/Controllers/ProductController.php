@@ -5,27 +5,28 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-use App\Models\Staff;
+use App\Models\Product;
 
-class StaffController extends Controller
+class ProductController extends Controller
 {
-    private $LIMIT = 5;
-    private $CURRENT_PAGE = 1;
+    private const LIMIT = 5;
+    private const CURRENT_PAGE = 1;
+    private const MODEL = 'PRODUCT';
 
     public function listAll (Request $request) {
-        $limit = $request->input('limit', $this->LIMIT);
-        $current_page = $request->input('page', $this->CURRENT_PAGE);
+        $limit = $request->input('limit', self::LIMIT);
+        $current_page = $request->input('page', self::CURRENT_PAGE);
 
         $offset = ($current_page - 1) * $limit;
 
-        $allItems = Staff::orderBy('id', 'ASC');
+        $allItems = Product::orderBy('id', 'ASC');
         $total = $allItems->count();
 
         $data = $allItems->skip($offset)->take($limit)->get();
 
         return response()->json([
             'statusCode' => 200,
-            'message' => 'Get all staffs successfully!',
+            'message' => 'Get all '. self::MODEL . ' successfully!',
             'pagination' => [
                 'total' => $total,
                 'current_page' => $current_page,
@@ -35,12 +36,29 @@ class StaffController extends Controller
         ]);
     }
 
+    public function getDetails ($id) {
+        $foundItem = Product::find($id);
+
+        if ($foundItem) {
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Get ' . self::MODEL . ' details successfully!',
+                'data' => $foundItem
+            ]);
+        }
+
+        return response()->json([
+            'statusCode' => 404,
+            'message' => self::MODEL . " details with id::{$id} not found!"
+        ]);
+    }
+
     public function create(Request $request) {
         $validated = Validator::make($request->all(), [
-            'staff_name' => 'required|string',
-            'role' => 'required|string|in:manager,receptionist,waiter',
-            'phone' => 'required|unique:staffs,phone|string',
-            'email' => 'required|unique:staffs,email|string|email',
+            'name' => 'required|string|unique:products,name|max:100',
+            'price' => 'required|decimal:2|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'type' => 'required|string|in:drinks,foods,other'
         ]);
 
         if ($validated->fails()) {
@@ -50,31 +68,31 @@ class StaffController extends Controller
             ]);
         }
 
-        $createdNew = new Staff();
+        $createdNew = new Product();
         $createdNew->fill($request->all());
         $createdNew->save();
 
         return response()->json([
             'statusCode' => 201,
-            'message' => 'Create new staff successfully!'
+            'message' => 'Create new ' . self::MODEL .' successfully!'
         ]);
     }
 
     public function update (Request $request, $id) {
-        $foundItem = Staff::find($id);
+        $foundItem = Product::find($id);
 
         if (!$foundItem) {
             return response()->json([
                 'statusCode' => 404,
-                'message' => "Staff with id::{$id} not found!"
+                'message' => self::MODEL . " with id::{$id} not found!"
             ]);
         }
 
         $validated = Validator::make($request->all(), [
-            'staff_name' => 'string',
-            'role' => 'string|in:manager,receptionist,waiter',
-            'phone' => 'unique:staffs,phone|string',
-            'email' => 'unique:staffs,email|string|email',
+            'name' => 'string|unique:products,name|max:100',
+            'price' => 'decimal:2|min:0',
+            'quantity' => 'numeric|min:0',
+            'type' => 'string|in:drinks,foods,other'
         ]);
 
         if ($validated->fails()) {
@@ -88,42 +106,25 @@ class StaffController extends Controller
 
         return response()->json([
             'statusCode' => 204,
-            'message' => "Update staff with id::{$id} successfully!"
-        ]);
-    }
-
-    public function getDetails ($id) {
-        $foundItem = Staff::find($id);
-
-        if ($foundItem) {
-            return response()->json([
-                'statusCode' => 200,
-                'message' => 'Get staff details successfully!',
-                'data' => $foundItem
-            ]);
-        }
-
-        return response()->json([
-            'statusCode' => 404,
-            'message' => "Staff details with id::{$id} not found!"
+            'message' => "Update " . self::MODEL ." with id::{$id} successfully!"
         ]);
     }
 
     public function destroy ($id) {
-        $foundItem = Staff::find($id);
+        $foundItem = Product::find($id);
 
         if ($foundItem) {
-            Staff::destroy($id);
+            Product::destroy($id);
 
             return response()->json([
                 'statusCode' => 204,
-                'message' => 'Delete staff successfully!',
+                'message' => 'Delete ' . self::MODEL . ' successfully!',
             ]);
         }
 
         return response()->json([
             'statusCode' => 404,
-            'message' => "Staff details with id::{$id} not found!"
+            'message' => self::MODEL . " details with id::{$id} not found!"
         ]);
     }
 }

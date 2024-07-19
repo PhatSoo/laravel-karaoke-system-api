@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\StaffController;
@@ -27,6 +28,14 @@ Route::controller(CustomerController::class)->prefix('customer')->group(function
 });
 
 Route::controller(InvoiceController::class)->prefix('invoice')->group(function () {
+    Route::get('/', 'listAll');
+    Route::post('/', 'create');
+    Route::get('/{id}', 'getDetails');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+});
+
+Route::controller(ProductController::class)->prefix('product')->group(function () {
     Route::get('/', 'listAll');
     Route::post('/', 'create');
     Route::get('/{id}', 'getDetails');

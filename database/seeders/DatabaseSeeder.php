@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\Product;
 use App\Models\Room;
 use App\Models\Song;
 use App\Models\Staff;
@@ -24,5 +25,6 @@ class DatabaseSeeder extends Seeder
         Song::factory()->count(10)->create();
         Booking::factory()->count(10)->create();
         Invoice::factory()->count(10)->create();
+        Product::factory()->count(10)->create();
     }
 }

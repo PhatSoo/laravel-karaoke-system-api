@@ -18,10 +18,10 @@ class SongController extends Controller
 
         $offset = ($current_page - 1) * $limit;
 
-        $allRooms = Song::orderBy('id', 'ASC');
-        $total = $allRooms->count();
+        $allItems = Song::orderBy('id', 'ASC');
+        $total = $allItems->count();
 
-        $room = $allRooms->skip($offset)->take($limit)->get();
+        $data = $allItems->skip($offset)->take($limit)->get();
 
         return response()->json([
             'statusCode' => 200,
@@ -31,7 +31,7 @@ class SongController extends Controller
                 'current_page' => $current_page,
                 'limit' => $limit
             ],
-            'data' => $room
+            'data' => $data
         ]);
     }
 
