@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Product;
+use App\Helpers\APIHelper;
 
 class ProductController extends Controller
 {
@@ -24,34 +25,15 @@ class ProductController extends Controller
 
         $data = $allItems->skip($offset)->take($limit)->get();
 
-        return response()->json([
-            'statusCode' => 200,
-            'message' => 'Get all '. self::MODEL . ' successfully!',
-            'pagination' => [
-                'total' => $total,
-                'current_page' => $current_page,
-                'limit' => $limit
-            ],
-            'data' => $data
-        ]);
+        $paginate = [
+            'total' => $total,
+            'current_page' => $current_page,
+            'limit' => $limit
+        ];
+
+        return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
     }
 
-    public function getDetails ($id) {
-        $foundItem = Product::find($id);
-
-        if ($foundItem) {
-            return response()->json([
-                'statusCode' => 200,
-                'message' => 'Get ' . self::MODEL . ' details successfully!',
-                'data' => $foundItem
-            ]);
-        }
-
-        return response()->json([
-            'statusCode' => 404,
-            'message' => self::MODEL . " details with id::{$id} not found!"
-        ]);
-    }
 
     public function create(Request $request) {
         $validated = Validator::make($request->all(), [
@@ -62,30 +44,21 @@ class ProductController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'statusCode' => 400,
-                'message' => $validated->messages()
-            ]);
+            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
         }
 
         $createdNew = new Product();
         $createdNew->fill($request->all());
         $createdNew->save();
 
-        return response()->json([
-            'statusCode' => 201,
-            'message' => 'Create new ' . self::MODEL .' successfully!'
-        ]);
+        return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
     }
 
     public function update (Request $request, $id) {
         $foundItem = Product::find($id);
 
         if (!$foundItem) {
-            return response()->json([
-                'statusCode' => 404,
-                'message' => self::MODEL . " with id::{$id} not found!"
-            ]);
+            return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
         }
 
         $validated = Validator::make($request->all(), [
@@ -96,35 +69,33 @@ class ProductController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'statusCode' => 400,
-                'message' => $validated->messages()
-            ]);
+            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
         }
 
         $foundItem->update($request->all());
 
-        return response()->json([
-            'statusCode' => 204,
-            'message' => "Update " . self::MODEL ." with id::{$id} successfully!"
-        ]);
+        return APIHelper::successResponse(statusCode: 204, message: "Update " . self::MODEL . " with id::{$id} successfully!");
+    }
+
+    public function getDetails ($id) {
+        $foundItem = Product::find($id);
+
+        if ($foundItem) {
+            return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." details with id::{$id} successfully!", data: $foundItem);
+        }
+
+        return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
     public function destroy ($id) {
         $foundItem = Product::find($id);
 
         if ($foundItem) {
-            Product::destroy($id);
+            Booking::destroy($id);
 
-            return response()->json([
-                'statusCode' => 204,
-                'message' => 'Delete ' . self::MODEL . ' successfully!',
-            ]);
+            return APIHelper::successResponse(statusCode: 204, message: "Update " . self::MODEL . " with id::{$id} successfully!");
         }
 
-        return response()->json([
-            'statusCode' => 404,
-            'message' => self::MODEL . " details with id::{$id} not found!"
-        ]);
+        return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 }

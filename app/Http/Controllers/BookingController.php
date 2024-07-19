@@ -7,15 +7,17 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 use App\Models\Booking;
+use App\Helpers\APIHelper;
 
 class BookingController extends Controller
 {
-    private $LIMIT = 5;
-    private $CURRENT_PAGE = 1;
+    private const LIMIT = 5;
+    private const CURRENT_PAGE = 1;
+    private const MODEL = 'BOOKING';
 
     public function listAll (Request $request) {
-        $limit = $request->input('limit', $this->LIMIT);
-        $current_page = $request->input('page', $this->CURRENT_PAGE);
+        $limit = $request->input('limit', self::LIMIT);
+        $current_page = $request->input('page', self::CURRENT_PAGE);
 
         $offset = ($current_page - 1) * $limit;
 
@@ -24,16 +26,13 @@ class BookingController extends Controller
 
         $data = $allItems->skip($offset)->take($limit)->get();
 
-        return response()->json([
-            'statusCode' => 200,
-            'message' => 'Get all bookings successfully!',
-            'pagination' => [
-                'total' => $total,
-                'current_page' => $current_page,
-                'limit' => $limit
-            ],
-            'data' => $data
-        ]);
+        $paginate = [
+            'total' => $total,
+            'current_page' => $current_page,
+            'limit' => $limit
+        ];
+
+        return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
     }
 
     public function create(Request $request) {
@@ -46,30 +45,21 @@ class BookingController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'statusCode' => 400,
-                'message' => $validated->messages()
-            ]);
+            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
         }
 
         $createdNew = new Booking();
         $createdNew->fill($request->all());
         $createdNew->save();
 
-        return response()->json([
-            'statusCode' => 201,
-            'message' => 'Create new booking successfully!'
-        ]);
+        return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
     }
 
     public function update (Request $request, $id) {
         $foundItem = Booking::find($id);
 
         if (!$foundItem) {
-            return response()->json([
-                'statusCode' => 404,
-                'message' => "Booking with id::{$id} not found!"
-            ]);
+            return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
         }
 
         $validated = Validator::make($request->all(),[
@@ -81,35 +71,22 @@ class BookingController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'statusCode' => 400,
-                'message' => $validated->messages()
-            ]);
+            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
         }
 
         $foundItem->update($request->all());
 
-        return response()->json([
-            'statusCode' => 204,
-            'message' => "Update booking with id::{$id} successfully!"
-        ]);
+        return APIHelper::successResponse(statusCode: 204, message: "Update " . self::MODEL . " with id::{$id} successfully!");
     }
 
     public function getDetails ($id) {
         $foundItem = Booking::find($id);
 
         if ($foundItem) {
-            return response()->json([
-                'statusCode' => 200,
-                'message' => 'Get booking details successfully!',
-                'data' => $foundItem
-            ]);
+            return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." details with id::{$id} successfully!", data: $foundItem);
         }
 
-        return response()->json([
-            'statusCode' => 404,
-            'message' => "Booking details with id::{$id} not found!"
-        ]);
+        return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
     public function destroy ($id) {
@@ -118,15 +95,9 @@ class BookingController extends Controller
         if ($foundItem) {
             Booking::destroy($id);
 
-            return response()->json([
-                'statusCode' => 204,
-                'message' => 'Delete booking successfully!',
-            ]);
+            return APIHelper::successResponse(statusCode: 204, message: "Update " . self::MODEL . " with id::{$id} successfully!");
         }
 
-        return response()->json([
-            'statusCode' => 404,
-            'message' => "Booking details with id::{$id} not found!"
-        ]);
+        return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 }
