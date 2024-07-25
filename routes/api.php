@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
@@ -65,4 +66,9 @@ Route::controller(StaffController::class)->prefix('staff')->group(function () {
     Route::get('/{id}', 'getDetails');
     Route::put('/{id}', 'update');
     Route::delete('/{id}', 'destroy');
+});
+
+Route::controller(AuthController::class)->prefix('auth')->group(function () {
+    Route::post('/login', 'login');
+    Route::post('/register', 'register');
 });

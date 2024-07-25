@@ -13,12 +13,5 @@ class Customer extends Model
         'name',
         'phone',
         'email',
-        'password'
     ];
-
-    protected function casts() {
-        return [
-            'password' => 'hashed'
-        ];
-    }
 }

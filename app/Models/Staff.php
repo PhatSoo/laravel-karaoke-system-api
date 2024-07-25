@@ -16,12 +16,5 @@ class Staff extends Model
         'role',
         'phone',
         'email',
-        'password'
     ];
-
-    protected function casts() {
-        return [
-            'password' => 'hashed'
-        ];
-    }
 }

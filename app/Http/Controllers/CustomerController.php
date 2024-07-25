@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 
 use App\Models\Customer;
 use App\Helpers\APIHelper;
@@ -39,8 +38,7 @@ class CustomerController extends Controller
         $validated = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required|unique:customers,phone|string',
-            'email' => 'required|unique:customers,email|string|email',
-            'password' => 'required|min:6'
+            'email' => 'required|unique:customers,email|string|email'
         ]);
 
         if ($validated->fails()) {
@@ -64,25 +62,12 @@ class CustomerController extends Controller
         $validated = Validator::make($request->all(), [
             'name' => 'string',
             'phone' => 'unique:customers,phone|string',
-            'email' => 'unique:customers,email|string|email',
-            'newPassword' => 'min:6',
-            'confirmPassword' => 'same:newPassword',
-            'password' => 'required'
+            'email' => 'unique:customers,email|string|email'
         ]);
 
         // Check validate form required fields
         if ($validated->fails()) {
             return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
-        }
-
-        // Check password required is wrong
-        if (!(Hash::check($request->password, $foundItem->password))) {
-            return APIHelper::errorResponse(statusCode: 403, message: 'Wrong Password!');
-        }
-
-        // Check newPassword field if exist => change password
-        if (isset($request['newPassword'])) {
-            $request['password'] = $request['newPassword'];
         }
 
         $foundItem->update($request->all());

@@ -41,7 +41,6 @@ class StaffController extends Controller
             'role' => 'required|string|in:manager,receptionist,waiter',
             'phone' => 'required|unique:staffs,phone|string',
             'email' => 'required|unique:staffs,email|string|email',
-            'password' => 'required|min:6'
         ]);
 
         if ($validated->fails()) {
@@ -67,24 +66,11 @@ class StaffController extends Controller
             'role' => 'string|in:manager,receptionist,waiter',
             'phone' => 'unique:staffs,phone|string',
             'email' => 'unique:staffs,email|string|email',
-            'newPassword' => 'min:6',
-            'confirmPassword' => 'same:newPassword|required_with:newPassword',
-            'password' => 'required'
         ]);
 
         // Check validate form required fields
         if ($validated->fails()) {
             return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
-        }
-
-        // Check password required is wrong
-        if (!(Hash::check($request->password, $foundItem->password))) {
-            return APIHelper::errorResponse(statusCode: 403, message: 'Wrong Password!');
-        }
-
-        // Check newPassword field if exist => change password
-        if (isset($request['newPassword'])) {
-            $request['password'] = $request['newPassword'];
         }
 
         $foundItem->update($request->all());
