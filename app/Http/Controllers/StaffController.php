@@ -92,7 +92,7 @@ class StaffController extends Controller
         $foundItem = Staff::find($id);
 
         if ($foundItem) {
-            Staff::destroy($id);
+            Booking::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

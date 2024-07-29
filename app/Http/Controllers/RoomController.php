@@ -90,7 +90,7 @@ class RoomController extends Controller
         $foundItem = Room::find($id);
 
         if ($foundItem) {
-            Room::destroy($id);
+            Booking::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

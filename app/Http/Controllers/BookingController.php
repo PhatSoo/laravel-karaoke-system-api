@@ -95,7 +95,7 @@ class BookingController extends Controller
         if ($foundItem) {
             Booking::destroy($id);
 
-            return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
+            return APIHelper::successResponse(statusCode: 200, message: "Update " . self::MODEL . " with id::{$id} successfully!");
         }
 
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");

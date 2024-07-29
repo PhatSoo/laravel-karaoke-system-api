@@ -88,7 +88,7 @@ class SongController extends Controller
         $foundItem = Song::find($id);
 
         if ($foundItem) {
-            Song::destroy($id);
+            Booking::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

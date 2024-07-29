@@ -91,7 +91,7 @@ class InvoiceController extends Controller
         $foundItem = Invoice::find($id);
 
         if ($foundItem) {
-            Invoice::destroy($id);
+            Booking::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }
