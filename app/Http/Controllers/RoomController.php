@@ -36,7 +36,7 @@ class RoomController extends Controller
 
     public function create(Request $request) {
         $validated = Validator::make($request->all(), [
-            'room_name' => 'required|unique:rooms,room_name|max:100',
+            'name' => 'required|unique:rooms,name|max:100',
             'capacity' => 'required|numeric|min:0|max:20',
             'price_per_hour' => 'required|decimal:2|min:10',
             'status' => 'required|string|in:available,occupied,maintenance',
@@ -61,7 +61,7 @@ class RoomController extends Controller
         }
 
         $validated = Validator::make($request->all(), [
-            'room_name' => 'unique:rooms,room_name|max:100',
+            'name' => 'unique:rooms,name|max:100',
             'capacity' => 'numeric|min:0|max:20',
             'price_per_hour' => 'decimal:2|min:10',
             'status' => 'string|in:available,occupied,maintenance',
