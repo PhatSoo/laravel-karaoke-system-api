@@ -36,23 +36,27 @@ class BookingController extends Controller
     }
 
     public function create(Request $request) {
-        $validated = Validator::make($request->all(),[
-            'room_id' => ['required', 'numeric', Rule::exists('rooms', 'id')],
-            'customer_id' => ['required', 'numeric', Rule::exists('customers', 'id')],
-            'start_time' => 'required|date',
-            'end_time' => 'date',
-            'status' => 'required|string|in:booked,completed,cancelled'
-        ]);
+        try {
+            $validated = Validator::make($request->all(),[
+                'room_id' => ['required', 'numeric', Rule::exists('rooms', 'id')],
+                'customer_id' => ['required', 'numeric', Rule::exists('customers', 'id')],
+                'start_time' => 'required|date',
+                'end_time' => 'date',
+                'status' => 'required|string|in:booked,completed,cancelled'
+            ]);
 
-        if ($validated->fails()) {
-            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
+            if ($validated->fails()) {
+                return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
+            }
+
+            $createdNew = new Booking();
+            $createdNew->fill($request->all());
+            $createdNew->save();
+
+            return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage());
         }
-
-        $createdNew = new Booking();
-        $createdNew->fill($request->all());
-        $createdNew->save();
-
-        return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
     }
 
     public function update (Request $request, $id) {
@@ -95,7 +99,7 @@ class BookingController extends Controller
         if ($foundItem) {
             Booking::destroy($id);
 
-            return APIHelper::successResponse(statusCode: 200, message: "Update " . self::MODEL . " with id::{$id} successfully!");
+            return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }
 
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");

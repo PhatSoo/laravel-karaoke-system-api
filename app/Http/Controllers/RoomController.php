@@ -12,7 +12,7 @@ class RoomController extends Controller
 {
     private const LIMIT = 5;
     private const CURRENT_PAGE = 1;
-    private const MODEL = 'CUSTOMER';
+    private const MODEL = 'ROOM';
 
     public function listAll (Request $request) {
         $limit = $request->input('limit', self::LIMIT);
@@ -90,7 +90,7 @@ class RoomController extends Controller
         $foundItem = Room::find($id);
 
         if ($foundItem) {
-            Booking::destroy($id);
+            Room::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

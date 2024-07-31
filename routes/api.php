@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\RoleController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(BookingController::class)->prefix('booking')->group(function () {
@@ -71,7 +72,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(AuthController::class)->prefix('auth')->group(function  () {
         Route::get('/info', 'info');
+        Route::get('/all', 'show');
         Route::post('/logout', 'logout');
+        Route::post('/role', 'decentralize');
+    });
+
+    Route::controller(RoleController::class)->prefix('role')->group(function () {
+        Route::get('/', 'listAll');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'getDetails');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
     });
 });
 

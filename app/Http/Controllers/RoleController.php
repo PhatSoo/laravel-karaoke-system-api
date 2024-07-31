@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 
-use App\Models\Staff;
+use App\Models\Role;
 use App\Helpers\APIHelper;
 
-class StaffController extends Controller
+class RoleController extends Controller
 {
     private const LIMIT = 5;
     private const CURRENT_PAGE = 1;
-    private const MODEL = 'STAFF';
+    private const MODEL = 'ROLE';
 
     public function listAll (Request $request) {
         $limit = $request->input('limit', self::LIMIT);
@@ -21,7 +20,7 @@ class StaffController extends Controller
 
         $offset = ($current_page - 1) * $limit;
 
-        $allItems = Staff::orderBy('id', 'ASC');
+        $allItems = Role::orderBy('id', 'ASC');
         $total = $allItems->count();
 
         $data = $allItems->skip($offset)->take($limit)->get();
@@ -37,17 +36,14 @@ class StaffController extends Controller
 
     public function create(Request $request) {
         $validated = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'role' => 'required|string|in:manager,receptionist,waiter',
-            'phone' => 'required|unique:staffs,phone|string',
-            'email' => 'required|unique:staffs,email|string|email',
+            'name' => 'required|unique:roles,name|string',
         ]);
 
         if ($validated->fails()) {
             return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
         }
 
-        $createdNew = new Staff();
+        $createdNew = new Role();
         $createdNew->fill($request->all());
         $createdNew->save();
 
@@ -55,17 +51,14 @@ class StaffController extends Controller
     }
 
     public function update (Request $request, $id) {
-        $foundItem = Staff::find($id);
+        $foundItem = Role::find($id);
 
         if (!$foundItem) {
             return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
         }
 
         $validated = Validator::make($request->all(), [
-            'name' => 'string',
-            'role' => 'string|in:manager,receptionist,waiter',
-            'phone' => 'unique:staffs,phone|string',
-            'email' => 'unique:staffs,email|string|email',
+            'name' => 'required|unique:roles,name|string'
         ]);
 
         // Check validate form required fields
@@ -79,7 +72,7 @@ class StaffController extends Controller
     }
 
     public function getDetails ($id) {
-        $foundItem = Staff::find($id);
+        $foundItem = Role::find($id);
 
         if ($foundItem) {
             return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." details with id::{$id} successfully!", data: $foundItem);
@@ -89,10 +82,10 @@ class StaffController extends Controller
     }
 
     public function destroy ($id) {
-        $foundItem = Staff::find($id);
+        $foundItem = Role::find($id);
 
         if ($foundItem) {
-            Staff::destroy($id);
+            Role::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

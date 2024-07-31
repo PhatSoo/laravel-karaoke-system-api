@@ -89,7 +89,7 @@ class CustomerController extends Controller
         $foundItem = Customer::find($id);
 
         if ($foundItem) {
-            Booking::destroy($id);
+            Customer::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

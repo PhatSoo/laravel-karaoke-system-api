@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 class APIHelper {
-    public static function successResponse($status = 'success', $statusCode = 200, $message = null, $data = [], $paginate = null) {
+    public static function successResponse($status = 'success', $statusCode = 200, $message = 'Request success!', $data = [], $paginate = null) {
         if (!is_null($paginate)) {
             return response()->json([
                 'status' => $status,

@@ -12,7 +12,7 @@ class SongController extends Controller
 {
     private const LIMIT = 5;
     private const CURRENT_PAGE = 1;
-    private const MODEL = 'CUSTOMER';
+    private const MODEL = 'SONG';
 
     public function listAll (Request $request) {
         $limit = $request->input('limit', self::LIMIT);
@@ -88,7 +88,7 @@ class SongController extends Controller
         $foundItem = Song::find($id);
 
         if ($foundItem) {
-            Booking::destroy($id);
+            Song::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

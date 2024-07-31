@@ -91,7 +91,7 @@ class ProductController extends Controller
         $foundItem = Product::find($id);
 
         if ($foundItem) {
-            Booking::destroy($id);
+            Product::destroy($id);
 
             return APIHelper::successResponse(statusCode: 200, message: "Remove " . self::MODEL . " with id::{$id} successfully!");
         }

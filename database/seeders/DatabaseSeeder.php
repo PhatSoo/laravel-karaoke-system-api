@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Booking;
 use App\Models\Customer;
@@ -12,6 +13,7 @@ use App\Models\Room;
 use App\Models\Song;
 use App\Models\Staff;
 use App\Models\User;
+use App\Models\Role;
 
 use Illuminate\Database\Seeder;
 
@@ -38,5 +40,14 @@ class DatabaseSeeder extends Seeder
             'username' => 'username',
             'password' => Hash::make('password')
         ]);
+
+        // version 2
+        Role::insert([
+            ['name' => 'Admin', 'key' => '01_admin'],
+            ['name' => 'Staff', 'key' => '02_staff'],
+        ]);
+
+        DB::insert('insert into users_roles (user_id, role_key) values (?, ?)', [1, '01_admin']);
+        DB::insert('insert into users_roles (user_id, role_key) values (?, ?)', [1, '02_staff']);
     }
 }
