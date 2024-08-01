@@ -13,6 +13,7 @@ class UserRole extends Model
     protected $table = 'users_roles';
 
     protected $hidden = [
+        'id',
         'user_id',
         'role_key'
     ];

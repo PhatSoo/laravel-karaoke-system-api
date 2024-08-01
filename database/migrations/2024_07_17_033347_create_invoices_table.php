@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
             $table->foreignId('staff_id')->references('id')->on('staffs')->onDelete('cascade');
             $table->decimal('total_amount')->default(0);
+            $table->string('payment_method')->nullable();
             $table->enum('payment_status', ['pending', 'paid', 'cancelled'])->default('pending');
             $table->timestamps();
         });

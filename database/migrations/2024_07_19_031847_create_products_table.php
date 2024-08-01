@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->decimal('price');
-            $table->integer('quantity')->default(0);
+            $table->integer('inventory')->default(0);
+            $table->string('unit');
             $table->enum('type', ['drinks', 'foods', 'other']);
             $table->timestamps();
         });

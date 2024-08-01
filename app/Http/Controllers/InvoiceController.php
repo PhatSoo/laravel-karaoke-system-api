@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
-use App\Models\Invoice;
 use App\Helpers\APIHelper;
+use App\Models\Invoice;
+use App\Models\Product;
+use App\Models\InvoiceProduct;
 
 class InvoiceController extends Controller
 {
@@ -97,5 +100,94 @@ class InvoiceController extends Controller
         }
 
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
+    }
+
+    // Order Products
+    public function orderDetails($id) {
+        try {
+            $foundItem = InvoiceProduct::where('invoice_id', $id)->get();
+
+            if ($foundItem) {
+                $data = [
+                    "invoice_id" => $id,
+                    "products" => $foundItem,
+                ];
+                return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." Order details with id::{$id} successfully!", data: $data);
+            }
+
+            return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage());
+        }
+    }
+
+    public function order(Request $request, $id) {
+        try {
+            DB::beginTransaction();
+
+            // Check exist invoice
+            $foundItem = Invoice::find($id);
+            if (is_null($foundItem)) {
+                return APIHelper::errorResponse(statusCode: 404, message: 'INVOICE not found');
+            }
+
+            $data = $request->all();
+
+            foreach($data as $order) {
+                $product_id = $order['product_id'];
+                $order_operator = $order['operator'] ?? null;
+
+                $foundProduct = Product::find($product_id);
+                if (is_null($foundProduct)) {
+                    // Product not found
+                    DB::rollBack();
+                    return APIHelper::errorResponse(statusCode: 404, message: "PRODUCT with id::{$product_id} not found!");
+                }
+                // Check require quantity > inventory
+                if (!$order_operator && $order['quantity'] > $foundProduct['inventory']) {
+                    DB::rollBack();
+                    return APIHelper::errorResponse(statusCode: 400, message: "PRODUCT with name::{$foundProduct->name} not enough to order!");
+                }
+
+                $row_existed = InvoiceProduct::where([['invoice_id', '=', $id], ['product_id', '=', $product_id]])->first();
+
+                if ($row_existed) {
+                    $result = $row_existed['quantity'];
+
+                    if (!$order_operator) {
+                        $result += $order['quantity'];
+                        $foundProduct->inventory -= $order['quantity'];
+                    }
+                    else {
+                        if ($order['quantity'] > $result) {
+                            DB::rollBack();
+                            return APIHelper::errorResponse(statusCode: 400, message: "PRODUCT with name::{$foundProduct->name} return too much!! Order Quantity: {$row_existed['quantity']}; Return Quantity: {$order['quantity']}");
+                        }
+                        $result -= $order['quantity'];
+                        $foundProduct->inventory += $order['quantity'];
+                    }
+
+                    $row_existed->update(['quantity' => $result]);
+                } else {
+                    InvoiceProduct::create([
+                        'invoice_id' => $id,
+                        'product_id' => $product_id,
+                        'quantity' => $order['quantity']
+                    ]);
+
+                    $foundProduct->inventory -= $order['quantity'];
+                }
+                // Change inventory in Product tables...
+                $foundProduct->save();
+            }
+
+            DB::commit();
+
+            return APIHelper::successResponse(message: 'Order Products successfully!');
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
+        }
     }
 }

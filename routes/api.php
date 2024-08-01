@@ -36,6 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', 'getDetails');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'destroy');
+
+        // Invoices Products
+        Route::get('/detail/{id}', 'orderDetails');
+        Route::post('/order/{id}', 'order');
     });
 
     Route::controller(ProductController::class)->prefix('product')->group(function () {
