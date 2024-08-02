@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Product;
 use App\Helpers\APIHelper;
@@ -34,12 +35,11 @@ class ProductController extends Controller
         return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
     }
 
-
     public function create(Request $request) {
         $validated = Validator::make($request->all(), [
             'name' => 'required|string|unique:products,name|max:100',
             'price' => 'required|decimal:2|min:0',
-            'quantity' => 'required|numeric|min:0',
+            'inventory' => 'numeric|min:0',
             'type' => 'required|string|in:drinks,foods,other'
         ]);
 
@@ -61,10 +61,11 @@ class ProductController extends Controller
             return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
         }
 
+        $request->only(['name', 'price', 'type']);
+
         $validated = Validator::make($request->all(), [
             'name' => 'string|unique:products,name|max:100',
             'price' => 'decimal:2|min:0',
-            'quantity' => 'numeric|min:0',
             'type' => 'string|in:drinks,foods,other'
         ]);
 
@@ -97,5 +98,52 @@ class ProductController extends Controller
         }
 
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
+    }
+
+    public function getProductsAlert(Request $request) {
+        try {
+            $limit_alert = $request->input('alert', 10);
+            $data = Product::where('inventory', '<', $limit_alert)->get();
+
+            return APIHelper::successResponse(statusCode: 200, data: $data, message: "Get all OUT OF STOCK ALERT PRODUCTS successfully!");
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
+        }
+    }
+
+    public function importProducts(Request $request) {
+        try {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            if (count($data) === 0) {
+                DB::rollBack();
+                return APIHelper::errorResponse(statusCode: 400, message: "Error occurred!");
+            }
+
+            foreach ($data as $product) {
+                $validated = Validator::make($product, [
+                    'id' => 'required|exists:products,id',
+                    'inventory' => 'required|numeric|min:1'
+                ]);
+
+                if ($validated->fails()) {
+                    DB::rollBack();
+                    return APIHelper::errorResponse(statusCode: 404, message: $validated->messages());
+                }
+
+                $id = $product['id'];
+                $foundProduct = Product::find($id);
+
+                $foundProduct->inventory += $product['inventory'];
+                $foundProduct->save();
+            }
+
+            DB::commit();
+            return APIHelper::successResponse(statusCode: 200, message: "Update PRODUCT inventory successfully!");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
+        }
     }
 }

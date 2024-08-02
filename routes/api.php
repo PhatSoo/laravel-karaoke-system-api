@@ -13,6 +13,8 @@ use App\Http\Controllers\SongController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\RoleController;
 
+use App\Http\Middleware\InventoryManageAccept;
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(BookingController::class)->prefix('booking')->group(function () {
         Route::get('/', 'listAll');
@@ -43,6 +45,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(ProductController::class)->prefix('product')->group(function () {
+        // Stock management start
+        Route::middleware(InventoryManageAccept::class)->group(function () {
+            Route::get('/stock', 'getProductsAlert');
+            Route::post('/stock', 'importProducts');
+        });
+        // Stock management end
+
         Route::get('/', 'listAll');
         Route::post('/', 'create');
         Route::get('/{id}', 'getDetails');
