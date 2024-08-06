@@ -42,9 +42,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // version 2
-        Role::insert([
-            ['name' => 'Admin', 'key' => '01_admin'],
-            ['name' => 'Staff', 'key' => '02_staff'],
+        $this->call([
+            RolesTableSeeder::class,
+            PermissionsTableSeeder::class,
+            RolesPermissionsTableSeeder::class
         ]);
 
         DB::insert('insert into users_roles (user_id, role_key) values (?, ?)', [1, '01_admin']);
