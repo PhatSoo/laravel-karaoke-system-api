@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SongController;
@@ -42,6 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // Invoices Products
         Route::get('/detail/{id}', 'orderDetails');
         Route::post('/order/{id}', 'order');
+    });
+
+    Route::controller(PermissionController::class)->prefix('permission')->group(function () {
+        Route::get('/', 'listAll');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'getDetails');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
     });
 
     Route::controller(ProductController::class)->prefix('product')->group(function () {
