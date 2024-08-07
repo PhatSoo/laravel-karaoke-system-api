@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 use App\Helpers\APIHelper;
 use App\Models\Permission;
@@ -35,19 +36,25 @@ class PermissionController extends Controller
     }
 
     public function create(Request $request) {
-        $validated = Validator::make($request->all(), [
-            'name' => 'required|unique:permissions,name|string',
-        ]);
+        try {
+            $validated = Validator::make($request->all(), [
+                'name' => 'required|unique:permissions,name|string',
+                // 'related_table' => 'required|in:'.$tables_name
+            ]);
 
-        if ($validated->fails()) {
-            return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
+            if ($validated->fails()) {
+                return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
+            }
+
+            $createdNew = new Permission();
+            $createdNew->fill($request->all());
+            $createdNew->save();
+
+            return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
         }
 
-        $createdNew = new Permission();
-        $createdNew->fill($request->all());
-        $createdNew->save();
-
-        return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
     }
 
     public function update (Request $request, $id) {

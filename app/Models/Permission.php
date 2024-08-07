@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 use App\Observers\PermissionObserver;
 
@@ -15,6 +16,11 @@ class Permission extends Model
 
     protected $fillable = [
         'name',
-        'key'
+        'key',
+        'related_table'
     ];
+
+    public function roles(): BelongsToMany{
+        return $this->belongsToMany(Role::class, 'roles_permissions', 'permission_key', 'role_key', 'key', 'key');
+    }
 }

@@ -100,6 +100,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(RoleController::class)->prefix('role')->group(function () {
+        // Decentralize permissions for role start
+        Route::get('/permission', 'showPermissions');
+        Route::post('/permission', 'decentralize');
+        // Decentralize permissions for role end
+
         Route::get('/', 'listAll');
         Route::post('/', 'create');
         Route::get('/{id}', 'getDetails');

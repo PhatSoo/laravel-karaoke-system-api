@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 use App\Helpers\APIHelper;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\UserRole;
 
 class AuthController extends Controller
 {
@@ -63,67 +62,45 @@ class AuthController extends Controller
 
     public function decentralize(Request $request) {
         try {
+            DB::beginTransaction();
             $data = $request->all();
 
             foreach ($data as $key => $value) {
                 $user_id = explode(':', $key)[1];
                 $existed_user = User::find($user_id);
                 if (is_null($existed_user)) {
+                    DB::rollBack();
                     return APIHelper::errorResponse(statusCode: 404, message: 'USER account not found');
                 }
 
                 if (is_array($value)) {
-                    // Get all current roles of user by user_id
-                    $user_roles = UserRole::where('user_id', '=', $user_id)->pluck('role_key')->toArray();
+                    // Check Role Keys exist ?
+                    $existing_roles = Role::whereIn('key', $value)->pluck('key')->toArray();
 
-                    // Get new roles in request
-                    $new_roles = array_diff($value, $user_roles);
-                    if (count($new_roles) === 0) {
-                        // If have no new roles => return success
-                        return APIHelper::successResponse(message: 'Update Role successfully!');
+                    $missing_keys = array_diff($value, $existing_roles);
+
+                    if (!empty($missing_keys)) {
+                        // if existed Role Key does not existed in Role Table
+                        DB::rollBack();
+                        return APIHelper::errorResponse(statusCode: 400, message: "Role Keys '" . implode(", ", $missing_keys) . "' do not exist!");
                     }
 
-                    // Get roles existed in DB but not in request to remove roles
-                    $removing_roles = array_diff($user_roles, $value);
-
-                    $insert_data = [];
-                    // Create new roles
-                    foreach ($new_roles as $role) {
-                        // Check existed roles
-                        $is_existed_role = Role::where('key', $role)->exists();
-                        if (!$is_existed_role) {
-                            return APIHelper::errorResponse(statusCode: 400, message: "Role Key '{$role}' does not exist!");
-                        }
-
-                        $insert_data[] = [
-                            'user_id' => $user_id,
-                            'role_key' => $role
-                        ];
-                    }
-
-                    // Insert all new roles if exist
-                    if (!empty($insert_data)) {
-                        UserRole::insert($insert_data);
-                    }
-
-                    // Remove roles that not in request
-                    UserRole::where('user_id', $user_id)->whereIn('role_key', $removing_roles)->delete();
+                    $existed_user->roles()->sync($value);
                 }
             }
+
+            DB::commit();
             // All insert roles success
             return APIHelper::successResponse(message: 'Update Role successfully!');
         } catch (\Throwable $th) {
+            DB::rollBack();
             return APIHelper::errorResponse(message: $th->getMessage());
         }
     }
 
     public function show(Request $request) {
         try {
-            $data = UserRole::all()->groupBy('user_id')->map(function ($roles) {
-                $user = $roles->first()->user;
-                $user->roles = $roles->pluck('role');
-                return $user;
-            });
+            $data = User::with('roles')->get();
 
             return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data);
         } catch (\Throwable $th) {

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
-use App\Models\Role;
 use App\Helpers\APIHelper;
+use App\Models\Role;
+use App\Models\Permission;
 
 class RoleController extends Controller
 {
@@ -91,5 +93,52 @@ class RoleController extends Controller
         }
 
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
+    }
+
+    public function showPermissions() {
+        $data = Role::with('permissions')->get();
+        return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data);
+    }
+
+    public function decentralize(Request $request) {
+        try {
+            DB::beginTransaction();
+            $data = $request->all();
+            // example data
+            /*
+            {
+                role_key_1: [
+                    permission_key_1,
+                    permission_key_2
+                ],
+                role_key_2: [...]
+            }
+            */
+
+            foreach ($data as $role_key => $value) {
+                $existed_role = Role::find($role_key);
+                if (is_null($existed_role)) {
+                    DB::rollBack();
+                    return APIHelper::errorResponse(statusCode: 404, message: "ROLE::{$role_key} not found");
+                }
+
+                if (is_array($value)) {
+                    $existing_permissions = Permission::whereIn('key', $value)->pluck('key')->toArray();
+                    $missing_roles = array_diff($value, $existing_permissions);
+                    if (!empty($missing_roles)) {
+                        DB::rollBack();
+                        return APIHelper::errorResponse(statusCode: 400, message: "Permission Key::". implode(',', $missing_roles) ." does not exist!");
+                    }
+
+                    $existed_role->permissions()->sync($value);
+                }
+            }
+            DB::commit();
+            // All insert roles success
+            return APIHelper::successResponse(message: 'Update Permissions for Role successfully!');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return APIHelper::errorResponse(message: $th->getMessage());
+        }
     }
 }

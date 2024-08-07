@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 use App\Helpers\APIHelper;
@@ -40,8 +39,8 @@ class InvoiceController extends Controller
 
     public function create(Request $request) {
         $validated = Validator::make($request->all(),[
-            'booking_id' => ['required', 'numeric', Rule::exists('bookings', 'id')],
-            'staff_id' => ['required', 'numeric', Rule::exists('staffs', 'id')],
+            'booking_id' => 'required|numeric|exists:bookings,id',
+            'staff_id' => 'required|numeric|exists:staffs,id',
             'total_amount' => 'decimal:2',
             'payment_status' => 'string|in:pending,paid,cancelled'
         ]);
@@ -65,8 +64,8 @@ class InvoiceController extends Controller
         }
 
         $validated = Validator::make($request->all(),[
-            'booking_id' => ['numeric', Rule::exists('bookings', 'id')],
-            'staff_id' => ['numeric', Rule::exists('staffs', 'id')],
+            'booking_id' => 'numeric|exists:bookings,id',
+            'staff_id' => 'numeric|exists:staffs,id',
             'total_amount' => 'decimal:2',
             'payment_status' => 'string|in:pending,paid,cancelled'
         ]);

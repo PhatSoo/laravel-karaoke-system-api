@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 use App\Models\Booking;
 use App\Helpers\APIHelper;
@@ -38,8 +37,8 @@ class BookingController extends Controller
     public function create(Request $request) {
         try {
             $validated = Validator::make($request->all(),[
-                'room_id' => ['required', 'numeric', Rule::exists('rooms', 'id')],
-                'customer_id' => ['required', 'numeric', Rule::exists('customers', 'id')],
+                'room_id' => 'required|numeric|exists:rooms,id',
+                'customer_id' => 'required|numeric|exists:customers,id',
                 'start_time' => 'required|date',
                 'end_time' => 'date',
                 'status' => 'required|string|in:booked,completed,cancelled'
@@ -67,8 +66,8 @@ class BookingController extends Controller
         }
 
         $validated = Validator::make($request->all(),[
-            'room_id' => ['numeric', Rule::exists('rooms', 'id')],
-            'customer_id' => ['numeric', Rule::exists('customers', 'id')],
+            'room_id' => 'numeric|exists:rooms,id',
+            'customer_id' => 'numeric|exists:customers,id',
             'start_time' => 'date',
             'end_time' => 'date',
             'status' => 'string|in:booked,completed,cancelled'
