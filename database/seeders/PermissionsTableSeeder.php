@@ -15,16 +15,16 @@ class PermissionsTableSeeder extends Seeder
     public function run(): void
     {
         Permission::insert([
-            ['name' => 'Manage Inventory', 'key' => 'manage_inventory'],
-            ['name' => 'Manage Staff', 'key' => 'manage_staff'],
-            ['name' => 'Manage Customers', 'key' => 'manage_customers'],
-            ['name' => 'Manage Rooms', 'key' => 'manage_rooms'],
-            ['name' => 'Manage Revenue', 'key' => 'manage_revenue'],
-            ['name' => 'Manage Permissions', 'key' => 'manage_permissions'],
-            ['name' => 'Manage Invoices', 'key' => 'manage_invoices'],
-            ['name' => 'Manage Songs', 'key' => 'manage_songs'],
-            ['name' => 'Manage Roles', 'key' => 'manage_roles'],
-            ['name' => 'Manage Bookings', 'key' => 'manage_bookings'],
+            ['name' => 'Manage Inventory'],
+            ['name' => 'Manage Staff'],
+            ['name' => 'Manage Customers'],
+            ['name' => 'Manage Rooms'],
+            ['name' => 'Manage Revenue'],
+            ['name' => 'Manage Permissions'],
+            ['name' => 'Manage Invoices'],
+            ['name' => 'Manage Songs'],
+            ['name' => 'Manage Roles'],
+            ['name' => 'Manage Bookings'],
         ]);
     }
 }

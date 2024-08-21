@@ -15,26 +15,26 @@ class RolesPermissionsTableSeeder extends Seeder
     {
         DB::table('roles_permissions')->insert([
             // Admin permissions
-            ['role_key' => '01_admin', 'permission_key' => 'manage_inventory'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_staff'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_customers'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_rooms'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_revenue'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_permissions'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_invoices'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_songs'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_roles'],
-            ['role_key' => '01_admin', 'permission_key' => 'manage_bookings'],
+            ['role_id' => 1, 'permission_id' => 1],
+            ['role_id' => 1, 'permission_id' => 2],
+            ['role_id' => 1, 'permission_id' => 3],
+            ['role_id' => 1, 'permission_id' => 4],
+            ['role_id' => 1, 'permission_id' => 5],
+            ['role_id' => 1, 'permission_id' => 6],
+            ['role_id' => 1, 'permission_id' => 7],
+            ['role_id' => 1, 'permission_id' => 8],
+            ['role_id' => 1, 'permission_id' => 9],
+            ['role_id' => 1, 'permission_id' => 10],
 
             // Manager permissions
-            ['role_key' => '03_manager', 'permission_key' => 'manage_inventory'],
-            ['role_key' => '03_manager', 'permission_key' => 'manage_staff'],
-            ['role_key' => '03_manager', 'permission_key' => 'manage_customers'],
-            ['role_key' => '03_manager', 'permission_key' => 'manage_rooms'],
+            ['role_id' => 3, 'permission_id' => 1],
+            ['role_id' => 3, 'permission_id' => 2],
+            ['role_id' => 3, 'permission_id' => 3],
+            ['role_id' => 3, 'permission_id' => 4],
 
             // Staff permissions
-            ['role_key' => '02_staff', 'permission_key' => 'manage_customers'],
-            ['role_key' => '02_staff', 'permission_key' => 'manage_rooms'],
+            ['role_id' => 2, 'permission_id' => 3],
+            ['role_id' => 2, 'permission_id' => 4],
         ]);
     }
 }

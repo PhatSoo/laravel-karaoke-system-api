@@ -20,10 +20,10 @@ class Role extends Model
     ];
 
     public function permissions(): BelongsToMany{
-        return $this->belongsToMany(Permission::class, 'roles_permissions', 'role_key', 'permission_key', 'key', 'key');
+        return $this->belongsToMany(Permission::class, 'roles_permissions');
     }
 
     public function hasPermission($permission) {
-        return $this->permissions->contains('key', $permission);
+        return $this->permissions->contains('id', $permission);
     }
 }
