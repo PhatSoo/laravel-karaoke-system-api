@@ -21,8 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->respond(function (Response $response) {
-            if ($response->getStatusCode() === 401) {
+            $status_code = $response->getStatusCode();
+
+            if ($status_code === 401) {
                 return APIHelper::errorResponse(statusCode: 401, message: 'Unauthenticated');
+            }
+
+            if ($status_code === 403) {
+                return APIHelper::errorResponse(statusCode: 403, message: 'You have no permission.');
             }
         });
     })->create();

@@ -6,10 +6,10 @@ use Illuminate\Auth\Access\Response;
 
 use App\Models\User;
 
-class PermissionPolicy
+class RolePolicy
 {
     public function manage(User $user): Response {
-        return $user->hasPermission('manage_permissions')
+        return $user->hasPermission('manage_roles')
                 ? Response::allow()
                 : Response::denyWithStatus(403);
     }

@@ -21,6 +21,10 @@ class RolesPermissionsTableSeeder extends Seeder
             ['role_key' => '01_admin', 'permission_key' => 'manage_rooms'],
             ['role_key' => '01_admin', 'permission_key' => 'manage_revenue'],
             ['role_key' => '01_admin', 'permission_key' => 'manage_permissions'],
+            ['role_key' => '01_admin', 'permission_key' => 'manage_invoices'],
+            ['role_key' => '01_admin', 'permission_key' => 'manage_songs'],
+            ['role_key' => '01_admin', 'permission_key' => 'manage_roles'],
+            ['role_key' => '01_admin', 'permission_key' => 'manage_bookings'],
 
             // Manager permissions
             ['role_key' => '03_manager', 'permission_key' => 'manage_inventory'],

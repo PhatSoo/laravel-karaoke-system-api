@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('key')->nullable()->unique();
-            $table->string('related_table')->nullable();
             $table->timestamps();
         });
     }

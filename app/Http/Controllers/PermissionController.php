@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 use App\Helpers\APIHelper;
 use App\Models\Permission;
@@ -39,7 +40,6 @@ class PermissionController extends Controller
         try {
             $validated = Validator::make($request->all(), [
                 'name' => 'required|unique:permissions,name|string',
-                // 'related_table' => 'required|in:'.$tables_name
             ]);
 
             if ($validated->fails()) {
@@ -79,13 +79,18 @@ class PermissionController extends Controller
     }
 
     public function getDetails ($id) {
-        $foundItem = Permission::find($id);
+        try {
+            $foundItem = Permission::find($id);
 
-        if ($foundItem) {
-            return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." details with id::{$id} successfully!", data: $foundItem);
+            if ($foundItem) {
+                return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." details with id::{$id} successfully!", data: $foundItem);
+            }
+
+            return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage());
         }
 
-        return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
     public function destroy ($id) {
