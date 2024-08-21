@@ -8,8 +8,10 @@ use App\Models\User;
 
 class UserPolicy
 {
+    private $table_name = 'users';
+
     public function manage(User $user): Response {
-        return $user->hasPermission('manage_users')
+        return $user->hasPermission($this->table_name)
                 ? Response::allow()
                 : Response::denyWithStatus(403);
     }

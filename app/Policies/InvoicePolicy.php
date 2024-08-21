@@ -8,8 +8,10 @@ use App\Models\User;
 
 class InvoicePolicy
 {
+    private $table_name = 'invoices';
+
     public function manage(User $user): Response {
-        return $user->hasPermission('manage_invoices')
+        return $user->hasPermission($this->table_name)
                 ? Response::allow()
                 : Response::denyWithStatus(403);
     }

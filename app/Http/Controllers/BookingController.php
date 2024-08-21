@@ -15,23 +15,27 @@ class BookingController extends Controller
     private const MODEL = 'BOOKING';
 
     public function listAll (Request $request) {
-        $limit = $request->input('limit', self::LIMIT);
-        $current_page = $request->input('page', self::CURRENT_PAGE);
+        try {
+            $limit = $request->input('limit', self::LIMIT);
+            $current_page = $request->input('page', self::CURRENT_PAGE);
 
-        $offset = ($current_page - 1) * $limit;
+            $offset = ($current_page - 1) * $limit;
 
-        $allItems = Booking::orderBy('id', 'ASC');
-        $total = $allItems->count();
+            $allItems = Booking::orderBy('id', 'ASC');
+            $total = $allItems->count();
 
-        $data = $allItems->skip($offset)->take($limit)->get();
+            $data = $allItems->skip($offset)->take($limit)->get();
 
-        $paginate = [
-            'total' => $total,
-            'current_page' => $current_page,
-            'limit' => $limit
-        ];
+            $paginate = [
+                'total' => $total,
+                'current_page' => $current_page,
+                'limit' => $limit
+            ];
 
-        return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
+            return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
+        } catch (\Throwable $th) {
+            return APIHelper::errorResponse(message: $th->getMessage());
+        }
     }
 
     public function create(Request $request) {
