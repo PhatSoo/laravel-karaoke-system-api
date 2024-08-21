@@ -1,0 +1,14 @@
+services:
+    karaoke-system:
+        image: mysql:latest
+        environment:
+            - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+            - MYSQL_DATABASE=${DB_DATABASE}
+        restart: always
+        ports:
+            - 3307:3306
+        volumes:
+            - karaoke-db:/var/lib/mysql
+
+volumes:
+    karaoke-db:
