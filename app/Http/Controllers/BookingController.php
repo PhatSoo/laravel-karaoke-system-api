@@ -8,13 +8,61 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Booking;
 use App\Helpers\APIHelper;
 
+/**
+ * @OA\Tag(
+ *     name="Bookings",
+ *     description="API Endpoints of Bookings"
+ * )
+*/
+
 class BookingController extends Controller
 {
     private const LIMIT = 5;
     private const CURRENT_PAGE = 1;
     private const MODEL = 'BOOKING';
 
-    public function listAll (Request $request) {
+    /**
+     * @OA\Get(
+     *      path="/api/booking",
+     *      tags={"Booking"},
+     *      summary="List all bookings",
+     *      description="Retrieve a paginated list of all bookings.",
+     *      @OA\Parameter(
+     *          name="limit",
+     *          in="query",
+     *          required=false,
+     *          @OA\Schema(type="integer", default=10)
+     *      ),
+     *      @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          required=false,
+     *          @OA\Schema(type="integer", default=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="paginate", type="object",
+     *                  @OA\Property(property="total", type="integer"),
+     *                  @OA\Property(property="current_page", type="integer"),
+     *                  @OA\Property(property="limit", type="integer")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
+     */
+    public function listAll(Request $request) {
         try {
             $limit = $request->input('limit', self::LIMIT);
             $current_page = $request->input('page', self::CURRENT_PAGE);
@@ -38,6 +86,43 @@ class BookingController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/booking",
+     *      tags={"Booking"},
+     *      summary="Create a new booking",
+     *      description="Create a new booking record.",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"room_id","customer_id","start_time","status"},
+     *              @OA\Property(property="room_id", type="integer", example=1),
+     *              @OA\Property(property="customer_id", type="integer", example=1),
+     *              @OA\Property(property="start_time", type="string", format="date-time", example="2024-08-21T15:00:00Z"),
+     *              @OA\Property(property="end_time", type="string", format="date-time", example="2024-08-21T17:00:00Z"),
+     *              @OA\Property(property="status", type="string", example="booked")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Booking created successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="data", type="object")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Validation error",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      )
+     * )
+     */
     public function create(Request $request) {
         try {
             $validated = Validator::make($request->all(),[
@@ -62,7 +147,57 @@ class BookingController extends Controller
         }
     }
 
-    public function update (Request $request, $id) {
+    /**
+     * @OA\Put(
+     *      path="/api/booking/{id}",
+     *      tags={"Booking"},
+     *      summary="Update a booking",
+     *      description="Update an existing booking record.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="room_id", type="integer", example=1),
+     *              @OA\Property(property="customer_id", type="integer", example=1),
+     *              @OA\Property(property="start_time", type="string", format="date-time", example="2024-08-21T15:00:00Z"),
+     *              @OA\Property(property="end_time", type="string", format="date-time", example="2024-08-21T17:00:00Z"),
+     *              @OA\Property(property="status", type="string", example="booked")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Booking updated successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="data", type="object")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Validation error",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Booking not found",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
+     */
+    public function update(Request $request, $id) {
         $foundItem = Booking::find($id);
 
         if (!$foundItem) {
@@ -86,7 +221,38 @@ class BookingController extends Controller
         return APIHelper::successResponse(statusCode: 200, message: "Update " . self::MODEL . " with id::{$id} successfully!");
     }
 
-    public function getDetails ($id) {
+    /**
+     * @OA\Get(
+     *      path="/api/booking/{id}",
+     *      tags={"Booking"},
+     *      summary="Get booking details",
+     *      description="Retrieve the details of a specific booking.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *              @OA\Property(property="data", type="object")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Booking not found",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
+     */
+    public function getDetails($id) {
         $foundItem = Booking::find($id);
 
         if ($foundItem) {
@@ -96,6 +262,36 @@ class BookingController extends Controller
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
+    /**
+     * @OA\Delete(
+     *      path="/api/booking/{id}",
+     *      tags={"Booking"},
+     *      summary="Delete a booking",
+     *      description="Remove a specific booking by its ID.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Booking removed successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Booking not found",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
+     */
     public function destroy ($id) {
         $foundItem = Booking::find($id);
 
