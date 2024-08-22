@@ -8,8 +8,10 @@ use App\Models\User;
 
 class SongPolicy
 {
+    private $table_name = 'songs';
+
     public function manage(User $user): Response {
-        return $user->hasPermission('manage_songs')
+        return $user->hasPermission($this->table_name)
                 ? Response::allow()
                 : Response::denyWithStatus(403);
     }

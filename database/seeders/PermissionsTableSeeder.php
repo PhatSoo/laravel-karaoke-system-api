@@ -15,16 +15,16 @@ class PermissionsTableSeeder extends Seeder
     public function run(): void
     {
         Permission::insert([
-            ['name' => 'Manage Inventory', 'key' => 'manage_inventory'],
-            ['name' => 'Manage Staff', 'key' => 'manage_staff'],
-            ['name' => 'Manage Customers', 'key' => 'manage_customers'],
-            ['name' => 'Manage Rooms', 'key' => 'manage_rooms'],
-            ['name' => 'Manage Revenue', 'key' => 'manage_revenue'],
-            ['name' => 'Manage Permissions', 'key' => 'manage_permissions'],
-            ['name' => 'Manage Invoices', 'key' => 'manage_invoices'],
-            ['name' => 'Manage Songs', 'key' => 'manage_songs'],
-            ['name' => 'Manage Roles', 'key' => 'manage_roles'],
-            ['name' => 'Manage Bookings', 'key' => 'manage_bookings'],
+            ['name' => 'Manage Inventory', 'related_table' => 'products'],
+            ['name' => 'Manage Staff', 'related_table' => 'staffs'],
+            ['name' => 'Manage Customers', 'related_table' => 'customers'],
+            ['name' => 'Manage Rooms', 'related_table' => 'rooms'],
+            ['name' => 'Manage Revenue', 'related_table' => 'invoices'],
+            ['name' => 'Manage Permissions', 'related_table' => 'permissions'],
+            ['name' => 'Manage Invoices', 'related_table' => 'invoices'],
+            ['name' => 'Manage Songs', 'related_table' => 'songs'],
+            ['name' => 'Manage Roles', 'related_table' => 'roles'],
+            ['name' => 'Manage Bookings', 'related_table' => 'bookings'],
         ]);
     }
 }

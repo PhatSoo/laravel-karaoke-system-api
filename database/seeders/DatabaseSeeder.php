@@ -36,10 +36,6 @@ class DatabaseSeeder extends Seeder
         Booking::factory()->count(10)->create();
         Invoice::factory()->count(10)->create();
         Product::factory()->count(10)->create();
-        User::insert([
-            'username' => 'username',
-            'password' => Hash::make('password')
-        ]);
 
         // version 2
         $this->call([
@@ -48,8 +44,11 @@ class DatabaseSeeder extends Seeder
             RolesPermissionsTableSeeder::class
         ]);
 
-        DB::insert('insert into users_roles (user_id, role_key) values (?, ?)', [1, '01_admin']);
-        DB::insert('insert into users_roles (user_id, role_key) values (?, ?)', [1, '02_staff']);
+        User::insert([
+            'username' => 'username',
+            'password' => Hash::make('password'),
+            'role_id' => 1
+        ]);
 
         DB::insert('insert into invoices_products (invoice_id, product_id, quantity) values (?, ?, ?)', [1, 3, 10]);
         DB::insert('insert into invoices_products (invoice_id, product_id, quantity) values (?, ?, ?)', [1, 6, 15]);

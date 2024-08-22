@@ -9,7 +9,13 @@ use Illuminate\Support\Facades\DB;
 use App\Helpers\APIHelper;
 use App\Models\Invoice;
 use App\Models\Product;
-use App\Models\InvoiceProduct;
+
+/**
+ * @OA\Tag(
+ *     name="Invoices",
+ *     description="API Endpoints of Invoices"
+ * )
+*/
 
 class InvoiceController extends Controller
 {
@@ -17,6 +23,36 @@ class InvoiceController extends Controller
     private const CURRENT_PAGE = 1;
     private const MODEL = 'INVOICE';
 
+    /**
+     * @OA\Get(
+     *     path="/invoices",
+     *     summary="Retrieve a list of invoices",
+     *     description="Get all invoices with pagination",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Number of records to return",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=10)
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number to return",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved invoices",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *     )
+     * )
+     */
     public function listAll (Request $request) {
         $limit = $request->input('limit', self::LIMIT);
         $current_page = $request->input('page', self::CURRENT_PAGE);
@@ -37,6 +73,31 @@ class InvoiceController extends Controller
         return APIHelper::successResponse(statusCode: 200, message: 'Get all ' . self::MODEL .' successfully!', data: $data, paginate: $paginate);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/invoices",
+     *     summary="Create a new invoice",
+     *     description="Create a new invoice",
+     *     tags={"Invoices"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="booking_id", type="integer", example=1),
+     *             @OA\Property(property="staff_id", type="integer", example=1),
+     *             @OA\Property(property="total_amount", type="number", format="decimal", example=100.00),
+     *             @OA\Property(property="payment_status", type="string", enum={"pending", "paid", "cancelled"}, example="pending")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Successfully created invoice",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *     )
+     * )
+     */
     public function create(Request $request) {
         $validated = Validator::make($request->all(),[
             'booking_id' => 'required|numeric|exists:bookings,id',
@@ -56,6 +117,42 @@ class InvoiceController extends Controller
         return APIHelper::successResponse(statusCode: 201, message: 'Create new ' . self::MODEL .' successfully!');
     }
 
+    /**
+     * @OA\Put(
+     *     path="/invoices/{id}",
+     *     summary="Update an existing invoice",
+     *     description="Update an invoice by ID",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Invoice ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="booking_id", type="integer", example=1),
+     *             @OA\Property(property="staff_id", type="integer", example=1),
+     *             @OA\Property(property="total_amount", type="number", format="decimal", example=150.00),
+     *             @OA\Property(property="payment_status", type="string", enum={"pending", "paid", "cancelled"}, example="paid")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully updated invoice",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invoice not found",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *     )
+     * )
+     */
     public function update (Request $request, $id) {
         $foundItem = Invoice::find($id);
 
@@ -79,6 +176,29 @@ class InvoiceController extends Controller
         return APIHelper::successResponse(statusCode: 200, message: "Update " . self::MODEL . " with id::{$id} successfully!");
     }
 
+    /**
+     * @OA\Get(
+     *     path="/invoices/{id}",
+     *     summary="Get invoice details",
+     *     description="Retrieve details of a specific invoice by ID",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Invoice ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved invoice details",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invoice not found",
+     *     )
+     * )
+     */
     public function getDetails ($id) {
         $foundItem = Invoice::find($id);
 
@@ -89,6 +209,29 @@ class InvoiceController extends Controller
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/invoices/{id}",
+     *     summary="Delete an invoice",
+     *     description="Delete an invoice by ID",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Invoice ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully deleted invoice",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invoice not found",
+     *     )
+     * )
+     */
     public function destroy ($id) {
         $foundItem = Invoice::find($id);
 
@@ -101,6 +244,29 @@ class InvoiceController extends Controller
         return APIHelper::errorResponse(statusCode: 404, message: self::MODEL . " with id::{$id} not found!");
     }
 
+    /**
+     * @OA\Get(
+     *     path="/invoices/{id}/order-details",
+     *     summary="Get order details for an invoice",
+     *     description="Retrieve product order details for a specific invoice by ID",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Invoice ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved order details",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invoice or products not found",
+     *     )
+     * )
+     */
     // Order Products
     public function orderDetails($id) {
         try {
@@ -120,6 +286,44 @@ class InvoiceController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/invoices/{id}/order",
+     *     summary="Order products for an invoice",
+     *     description="Order products by invoice ID",
+     *     tags={"Invoices"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Invoice ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="product_id", type="integer", example=1),
+     *                 @OA\Property(property="quantity", type="integer", example=2),
+     *                 @OA\Property(property="operator", type="string", enum={"add", "subtract"}, example="add")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully ordered products",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Invoice or product not found",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *     )
+     * )
+     */
     public function order(Request $request, $id) {
         try {
             DB::beginTransaction();

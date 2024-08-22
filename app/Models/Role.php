@@ -15,15 +15,14 @@ class Role extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'key'
+        'name'
     ];
 
     public function permissions(): BelongsToMany{
-        return $this->belongsToMany(Permission::class, 'roles_permissions', 'role_key', 'permission_key', 'key', 'key');
+        return $this->belongsToMany(Permission::class, 'roles_permissions');
     }
 
-    public function hasPermission($permission) {
-        return $this->permissions->contains('key', $permission);
+    public function hasPermission($table_name) {
+        return $this->permissions->contains('related_table', $table_name);
     }
 }
