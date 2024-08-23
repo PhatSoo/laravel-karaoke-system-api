@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Helpers\APIHelper;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\InvoiceProduct;
 
 /**
  * @OA\Tag(
@@ -270,12 +271,17 @@ class InvoiceController extends Controller
     // Order Products
     public function orderDetails($id) {
         try {
-            $foundItem = InvoiceProduct::where('invoice_id', $id)->get();
+            $foundProducts = InvoiceProduct::where('invoice_id', $id)->get();
+            $total = 0;
+            foreach ($foundProducts as $item) {
+                $total += ($item->quantity * $item->product->price);
+            }
 
-            if ($foundItem) {
+            if ($foundProducts) {
                 $data = [
                     "invoice_id" => $id,
-                    "products" => $foundItem,
+                    "total" => $total,
+                    "products" => $foundProducts
                 ];
                 return APIHelper::successResponse(statusCode: 200, message: "Get " . self::MODEL ." Order details with id::{$id} successfully!", data: $data);
             }
@@ -388,6 +394,45 @@ class InvoiceController extends Controller
 
             return APIHelper::successResponse(message: 'Order Products successfully!');
 
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
+        }
+    }
+
+    public function payment($id, Request $request) {
+        try {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            // Check exist invoice
+            $foundItem = Invoice::find($id);
+            if (is_null($foundItem)) {
+                DB::rollBack();
+                return APIHelper::errorResponse(statusCode: 404, message: 'INVOICE not found');
+            }
+
+            if ($foundItem->payment_status === "paid") {
+                DB::rollBack();
+                return APIHelper::errorResponse(statusCode: 400, message: "This Invoice has been paid! INVOICE_ID::$id");
+            }
+
+            $validated = Validator::make($data,[
+                'payment_method' => 'required|string',
+                'total_amount' => 'required|decimal:2',
+            ]);
+
+            if ($validated->fails()) {
+                DB::rollBack();
+                return APIHelper::errorResponse(statusCode: 400, message: $validated->messages());
+            }
+
+            $data['payment_status'] = 'paid';
+            $foundItem->update($data);
+
+            DB::commit();
+
+            return APIHelper::successResponse(message: 'Payment for invoice successful!');
         } catch (\Throwable $th) {
             DB::rollBack();
             return APIHelper::errorResponse(message: $th->getMessage() . ' in line: ' . $th->getLine());
