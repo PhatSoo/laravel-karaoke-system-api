@@ -11,7 +11,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Rooms",
- *     description="API Endpoints of Permissions"
+ *     description="Manage Permissions"
  * )
 */
 

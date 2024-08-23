@@ -12,7 +12,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Staffs",
- *     description="API Endpoints of Staffs"
+ *     description="Manage Staffs"
  * )
 */
 

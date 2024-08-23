@@ -11,7 +11,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Bookings",
- *     description="API Endpoints of Bookings"
+ *     description="Manage Bookings"
  * )
 */
 

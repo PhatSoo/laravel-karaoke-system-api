@@ -11,7 +11,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Songs",
- *     description="API Endpoints of Songs"
+ *     description="Manage Songs"
  * )
 */
 

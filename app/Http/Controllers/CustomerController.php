@@ -11,7 +11,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Customers",
- *     description="API Endpoints of Customers"
+ *     description="Manage Customers"
  * )
 */
 

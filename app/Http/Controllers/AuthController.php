@@ -14,7 +14,7 @@ use App\Models\Role;
 /**
  * @OA\Tag(
  *     name="Authentication",
- *     description="API Endpoints of Authentication"
+ *     description="Manage Authentication & Authorization"
  * )
 */
 
@@ -23,7 +23,7 @@ class AuthController extends Controller
     private const MODEL = 'USER';
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      *      path="/api/info",
      *      tags={"Auth"},
      *      summary="Get current user info",
