@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Invoices Products
         Route::get('/detail/{id}', 'orderDetails');
         Route::post('/order/{id}', 'order');
+        Route::post('/payment/{id}', 'payment');
     });
 
     Route::controller(PermissionController::class)->middleware('can:manage,App\Models\Permission')->prefix('permission')->group(function () {
