@@ -17,13 +17,13 @@
     },
     "paths": {
         "/api/info": {
-            "post": {
+            "get": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Get current user info",
                 "description": "Retrieve the information of the currently logged-in user.",
-                "operationId": "61cab93cc666bd5be3c733fba2846535",
+                "operationId": "0de398fec7814733d4cd9acccecc0264",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -3083,31 +3083,31 @@
     "tags": [
         {
             "name": "Customers",
-            "description": "API Endpoints of Customers"
+            "description": "Manage Customers"
         },
         {
             "name": "Invoices",
-            "description": "API Endpoints of Invoices"
+            "description": "Manage Invoices"
         },
         {
             "name": "Permissions",
-            "description": "API Endpoints of Permissions"
+            "description": "Manage Permissions"
         },
         {
             "name": "Products",
-            "description": "API Endpoints of Products"
+            "description": "Manage Products"
         },
         {
             "name": "Roles",
-            "description": "API Endpoints of Roles"
+            "description": "Manage Roles"
         },
         {
             "name": "Rooms",
-            "description": "API Endpoints of Permissions"
+            "description": "Manage Permissions"
         },
         {
             "name": "Songs",
-            "description": "API Endpoints of Songs"
+            "description": "Manage Songs"
         },
         {
             "name": "Auth",

@@ -14,7 +14,7 @@ use App\Models\InvoiceProduct;
 /**
  * @OA\Tag(
  *     name="Invoices",
- *     description="API Endpoints of Invoices"
+ *     description="Manage Invoices"
  * )
 */
 

@@ -13,7 +13,7 @@ use App\Models\Permission;
 /**
  * @OA\Tag(
  *     name="Permissions",
- *     description="API Endpoints of Permissions"
+ *     description="Manage Permissions"
  * )
 */
 

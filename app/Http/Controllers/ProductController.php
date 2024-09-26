@@ -12,7 +12,7 @@ use App\Helpers\APIHelper;
 /**
  * @OA\Tag(
  *     name="Products",
- *     description="API Endpoints of Products"
+ *     description="Manage Products"
  * )
 */
 
